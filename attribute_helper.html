@@ -1,0 +1,255 @@
+<html>
+	<head>
+		<title>Attribute Point Buy Helper</title>
+		<style>
+			body {
+
+			}
+			.heading_attribute,.heading_bonus, .heading_modifier {
+				font-size: smaller;
+				display: inline-block;
+				text-align: center;
+			}
+			.heading_attribute {
+				margin-left: 4rem;
+				width: 3rem;
+			}
+			.heading_bonus {
+				width: 3rem;
+			}
+			.heading_modifier {
+				width: 3rem;
+			}
+			.attr_name {
+				display: inline-block;
+				width: 4rem;
+			}
+			.attribute, .bonus {
+				width: 3em;
+				margin: 0 0.2rem;
+				text-align: center;
+			}
+			.modifier {
+				font-family: Courier;
+				display: inline-block;
+				min-width: 3em;
+				text-align: center;
+			}
+			.attribute_label {
+				font-family: Courier;
+			}
+		</style>
+	</head>
+	<body>
+	<h1>Attribute Point Buy Helper</h1>
+		<label for="total_points"><input type="number" id="total_points" value="28" onchange="reset(document.getElementById('total_points').value)"> Total Points</label><br>
+		<label for="current_points"><input type="number" id="current_points" value="28" disabled="disabled"> Points remaining</label><br>
+		<button onclick="reset()"> Reset </button>
+		<hr>
+
+		<p class="heading_wrapper" for="attr_str" > 
+			<span class="heading_attribute">Attribute</span>
+			<span class="heading_bonus">Bonus</span>
+			<span class="heading_modifier">Modifier</span>
+		</p>
+		<label class="attribute_label" for="attr_str" >
+			<span class="attr_name">STR: </span>
+			<input type="number" id="attr_str" min="8" max="18" value="8" class="attribute" onchange="recalculate()"> 
+			<input type="number" id="attr_str_bonus" min="-2" max="4" value="0" class="bonus" onchange="updateBonus('attr_str')"> 
+			<span class="modifier" id="attr_str_mod">-1</span>
+		</label><br>
+		<label class="attribute_label" for="attr_dex" >
+			<span class="attr_name">DEX: </span>
+			<input type="number" id="attr_dex" min="8" max="18" value="8" class="attribute" onchange="recalculate()"> 
+			<input type="number" id="attr_dex_bonus" min="-2" max="4" value="0" class="bonus" onchange="updateBonus('attr_dex')"> 
+			<span class="modifier" id="attr_dex_mod">-1</span>
+		</label><br>
+		<label class="attribute_label" for="attr_con" >
+			<span class="attr_name">CON: </span>
+			<input type="number" id="attr_con" min="8" max="18" value="8" class="attribute" onchange="recalculate()"> 
+			<input type="number" id="attr_con_bonus" min="-2" max="4" value="0" class="bonus" onchange="updateBonus('attr_con')"> 
+			<span class="modifier" id="attr_con_mod">-1</span>
+		</label><br>
+		<label class="attribute_label" for="attr_int" >
+			<span class="attr_name">INT: </span>
+			<input type="number" id="attr_int" min="8" max="18" value="8" class="attribute" onchange="recalculate()"> 
+			<input type="number" id="attr_int_bonus" min="-2" max="4" value="0" class="bonus" onchange="updateBonus('attr_int')"> 
+			<span class="modifier" id="attr_int_mod">-1</span>
+		</label><br>
+		<label class="attribute_label" for="attr_wis" >
+			<span class="attr_name">WIS: </span>
+			<input type="number" id="attr_wis" min="8" max="18" value="8" class="attribute" onchange="recalculate()"> 
+			<input type="number" id="attr_wis_bonus" min="-2" max="4" value="0" class="bonus" onchange="updateBonus('attr_wis')"> 
+			<span class="modifier" id="attr_wis_mod">-1</span>
+		</label><br>
+		<label class="attribute_label" for="attr_cha" >
+			<span class="attr_name">CHA: </span>
+			<input type="number" id="attr_cha" min="8" max="18" value="8" class="attribute" onchange="recalculate()"> 
+			<input type="number" id="attr_cha_bonus" min="-2" max="4" value="0" class="bonus" onchange="updateBonus('attr_cha')"> 
+			<span class="modifier" id="attr_cha_mod">-1</span>
+		</label><br>
+	<script lang="javascript">
+		var total_points=28, 
+		current_points=28;
+		function setSpan(id, newvalue){
+			var element = document.getElementById(id);
+			if(element){
+				element.innerText = newvalue;
+			}
+		}
+		function setValue(id, newvalue){
+			var element = document.getElementById(id);
+			if(element){
+				element.value = newvalue;
+			}
+		}
+		function reset(total = 28) {
+			console.log("resetting to " + total);
+			total_points = total;
+			current_points = total;
+			var default_attribute_value = 8;
+
+			updatePointsDisplay();
+
+			var attributes = ["attr_str","attr_dex","attr_con","attr_int","attr_wis","attr_cha"];
+
+			attributes.forEach(function (attribute) {
+				setValue(attribute, default_attribute_value);
+				setModifierFromAttributeReturnCost(attribute);
+			});
+			
+		}
+
+		function updatePointsDisplay() {
+			setValue("total_points", total_points);
+			setValue("current_points", current_points);
+		}
+		function getModifier(attribute_value){
+				switch(attribute_value){
+					case 1:
+						return -5;
+					case 2:
+					case 3:
+						return -4;
+					case 4:
+					case 5:
+						return -3;					
+					case 6:
+					case 7:
+						return -2;
+					case 8:
+					case 9:
+						return -1;
+					case 10:
+					case 11:
+						return 0;
+					case 12:
+					case 13:
+						return 1;
+					case 14:
+					case 15:
+						return 2;
+					case 16:
+					case 17: 
+						return 3;
+					case 18:
+					case 19:
+						return 4;
+					case 20:
+					case 21:
+						return 5;
+					case 22:
+					case 23:
+						return 6;
+					case 24:
+					case 25:
+						return 7;
+					case 26:
+					case 27:
+						return 8;
+					case 28:
+					case 29:
+						return 9;
+					case 30:
+					case 31:
+						return 10;
+					default:
+						return -6;	
+				}
+		}
+		function getPointCost(attribute_value){
+			/*
+				Pointstable
+				Attributwert 9 = 1 Kaufpunkt
+				Attributwert 10 = 2 Kaufpunkte
+				Attributwert 11 = 3 Kaufpunkte
+				Attributwert 12 = 4 Kaufpunkte
+				Attributwert 13 = 5 Kaufpunkte
+				Attributwert 14 = 6 Kaufpunkte
+				Attributwert 15 = 8 Kaufpunkte
+				Attributwert 16 = 10 Kaufpunkte
+				Attributwert 17 = 13 Kaufpunkte
+				Attributwert 18 = 16 Kaufpunkte
+			*/
+
+			switch(attribute_value){
+				case 9:
+					return 1;
+				case 10:
+					return 2;
+				case 11:
+					return 3;
+				case 12:
+					return 4;
+				case 13:
+					return 5;
+				case 14:
+					return 6;
+				case 15:
+					return 8;
+				case 16:
+					return 10;
+				case 17:
+					return 13;
+				case 18:
+					return 16;	
+				default:
+					return 0;
+			}
+		}
+		function updateBonus(attribute_ID) {
+			setModifierFromAttributeReturnCost(attribute_ID);
+		}
+		function setModifierFromAttributeReturnCost(attribute_ID){
+			var attribute_dom_node = document.getElementById(attribute_ID);
+			var modifier_dom_node = document.getElementById(attribute_ID + "_mod");
+			var bonus_dom_node = document.getElementById(attribute_ID + "_bonus");
+			if(!attribute_dom_node || !modifier_dom_node || !bonus_dom_node){
+				console.error("attribute, modifier or bonus dom node not found ", attribute_ID);
+				return 0;
+			}
+			var attribute_value = parseInt(attribute_dom_node.value, 10);
+			var bonus_value = parseInt(bonus_dom_node.value, 10);
+			if(!isNaN(attribute_value) && !isNaN(bonus_value)){
+					setSpan(attribute_ID + "_mod", getModifier(attribute_value + bonus_value));
+					return (getPointCost(attribute_value));
+			}
+			return 0;
+		}
+
+		function recalculate(){
+			console.log("recalculate");
+			current_points = total_points;
+			current_points -= setModifierFromAttributeReturnCost("attr_str");
+			current_points -= setModifierFromAttributeReturnCost("attr_dex");
+			current_points -= setModifierFromAttributeReturnCost("attr_con");
+			current_points -= setModifierFromAttributeReturnCost("attr_int");
+			current_points -= setModifierFromAttributeReturnCost("attr_wis");
+			current_points -= setModifierFromAttributeReturnCost("attr_cha");
+			
+			updatePointsDisplay();
+
+		}
+	</script>
+	</body>
+</html>
