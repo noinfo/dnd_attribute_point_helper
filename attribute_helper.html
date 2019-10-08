@@ -178,20 +178,6 @@
 				}
 		}
 		function getPointCost(attribute_value){
-			/*
-				Pointstable
-				Attributwert 9 = 1 Kaufpunkt
-				Attributwert 10 = 2 Kaufpunkte
-				Attributwert 11 = 3 Kaufpunkte
-				Attributwert 12 = 4 Kaufpunkte
-				Attributwert 13 = 5 Kaufpunkte
-				Attributwert 14 = 6 Kaufpunkte
-				Attributwert 15 = 8 Kaufpunkte
-				Attributwert 16 = 10 Kaufpunkte
-				Attributwert 17 = 13 Kaufpunkte
-				Attributwert 18 = 16 Kaufpunkte
-			*/
-
 			switch(attribute_value){
 				case 9:
 					return 1;
@@ -238,7 +224,6 @@
 		}
 
 		function recalculate(){
-			console.log("recalculate");
 			current_points = total_points;
 			current_points -= setModifierFromAttributeReturnCost("attr_str");
 			current_points -= setModifierFromAttributeReturnCost("attr_dex");
