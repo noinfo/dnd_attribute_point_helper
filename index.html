@@ -9,27 +9,51 @@
 					background: beige;
 					color: black;
 					min-width: 320px;
+					font-size: 16px;
+			}
+			input {
+				font-size: 16px;
+				width: 100%;
+				overflow: hidden;
+			}
+			.base_options_row {
+				display: flex;
+				flex-direction: row;
+				margin-bottom: 0.5rem;
+			}
+			.total_points, .current_points {
+				flex: 1;
+				text-align: center;
+				padding: 1px;
+  			border: 2px transparent;
+  			border-style: inset;
+				min-width: 6rem;
+			}
+			.points_label {
+				display: flex;
+				flex: 2;
+				margin-left: 0.5em;
 			}
 
-			.total_points, .current_points {
-				text-align: center;
+			.current_points {
+				color: rgb(32,32,32);
 			}
 			.current_points.points_zero {
 				background: greenyellow;
-				color: rgba(32,32,32, 0.66);
 			}
 			.current_points.points_positive {
 				background: orange;
-				color: rgba(32,32,32, 0.66);
 			}
 			.current_points.points_negative {
 				background: red;
-  			color: white;
+				color: white;
 			}
 
-			.heading_wrapper {
+			.heading_wrapper, .attribute_wrapper {
 				display: flex;
 				flex-direction: row;
+				max-width: 640px;
+				justify-self: center;
 			}
 			.heading {
 				flex: 1;
@@ -37,15 +61,10 @@
 				text-align: center;
 			}
 
-
 			.with_margin {
 				margin: 0 0.2rem;
 			}
 		
-			.attribute_wrapper {
-				display: flex;
-				flex-direction: row;
-			}
 			.attr_name {
 				flex: 1;
 			}
@@ -75,8 +94,16 @@
 	<body>
 	<h1>Attribute Point Buy Helper</h1>
 		
-		<label for="total_points"><input type="number" id="total_points" class="total_points"  value="28" onchange="reset(document.getElementById('total_points').value)"> Total Points</label><br>
-		<label for="current_points"><input type="number" id="current_points" class="current_points points_positive" value="28" disabled="disabled"> Points remaining</label><br><br>
+		
+		<label for="total_points" class="base_options_row">
+			<input type="number" id="total_points" class="total_points"  value="28" onchange="reset(document.getElementById('total_points').value)"> 
+			<span class="points_label">Total Points</span>
+		</label>
+		
+		<div class="base_options_row">
+			<span id="current_points" class="current_points points_positive">28</span>
+			<span class="points_label">Points remaining</span>
+		</div>
 		<button onclick="reset()"> Reset </button>
 		<hr>
 
@@ -181,7 +208,7 @@
 
 		function updatePointsDisplay() {
 			setValue("total_points", total_points);
-			setValue("current_points", current_points);
+			setSpan("current_points", current_points);
 			updateCurrentPointsClass();
 		}
 		function getModifier(attribute_value){
@@ -299,4 +326,4 @@
 		}
 	</script>
 	</body>
-</html>
+</html>	
