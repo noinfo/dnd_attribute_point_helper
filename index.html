@@ -185,6 +185,7 @@
 
 			attributes.forEach(function (attribute) {
 				setValue(attribute, default_attribute_value);
+				setValue(attribute + "_bonus", 0);
 				setModifierAndTotalFromAttributeReturnCost(attribute);
 			});
 			
