@@ -96,11 +96,31 @@
       }
     </style>
     <template id="steppable-number">
-			<div class="steppable-number--wrapper">
-				<button id="steppable-number--button-subtract" class="steppable-number--button-subtract">-</button>
-				<span class="steppable-number--value" id="steppable-number--value">0</span>
-				<button id="steppable-number--button-add" class="steppable-number--button-add">+</button>
-			</div>
+			<style>
+				:host {
+					display: inline-flex;
+					flex-direction: row;
+					font-size: 16px;
+				}
+				.steppable-number--value {
+					display: inline-box;
+					min-width: 3em;
+					text-align: center;
+					line-height: 2em;
+				}
+				.steppable-number--button-subtract, .steppable-number--button-add {
+					font-size: 16px;
+					height: 2em;
+					width: 2em;
+					text-align: center;
+				}
+				
+			</style>
+
+			<button id="steppable-number--button-subtract" class="steppable-number--button-subtract">-</button>
+			<span class="steppable-number--value" id="steppable-number--value">0</span>
+			<button id="steppable-number--button-add" class="steppable-number--button-add">+</button>
+			
 		</template>
     <script lang="javascript">
 			const currentDocument = document.currentScript.ownerDocument;
@@ -118,17 +138,38 @@
 
 				_addToValue() {
 					const currentValue = parseInt(this.getAttribute('value'), 10);
+					const maxValue = parseInt(this.getAttribute('max'), 10);
 					if(!isNaN(currentValue)){
-						this.setAttribute('value', currentValue + 1);
-						this._valueChanged();
+						if(isNaN(maxValue)){
+							// no minimum defined
+							this.setAttribute('value', currentValue + 1);
+							this._valueChanged();
+						}else{
+							// only increase if currentValue is not yet maximum
+							if(currentValue < maxValue) {
+								this.setAttribute('value', currentValue + 1);
+								this._valueChanged();
+							}
+						}
 					}
 				}
 
 				_subtractFromValue() {
 					const currentValue = parseInt(this.getAttribute('value'), 10);
+					const minValue = parseInt(this.getAttribute('min'), 10);
 					if(!isNaN(currentValue)){
-						this.setAttribute('value', currentValue - 1);
-						this._valueChanged();
+						if(isNaN(minValue)){
+							// no minimum defined
+							this.setAttribute('value', currentValue - 1);
+							this._valueChanged();
+						}else{
+							// only decrease if currentValue is not yet minimum
+							if(currentValue > minValue) {
+								this.setAttribute('value', currentValue - 1);
+								this._valueChanged();
+							}
+						}
+						
 					}
 				}
 
@@ -270,8 +311,9 @@
         value="8"
         class="attribute with_margin"
         onchange="recalculate()"
-      />
-      <input
+			/>
+			<steppable-number onchange="updateBonus('attr_con')" value="0" min="-10" max="10" id="attr_con_bonus"></steppable-number>
+      <!-- <input
         type="number"
         onfocus="this.select();"
         pattern="[0-9]*"
@@ -281,7 +323,7 @@
         value="0"
         class="bonus with_margin"
         onchange="updateBonus('attr_con')"
-      />
+      /> -->
       <span class="total" id="attr_con_total">8</span>
       <span class="modifier" id="attr_con_mod">-1</span>
     </p>
