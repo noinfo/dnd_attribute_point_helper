@@ -76,6 +76,7 @@
         flex: 1;
         text-align: center;
         box-sizing: border-box;
+				justify-content: center;
       }
       .modifier,
       .total {
@@ -116,11 +117,9 @@
 				}
 				
 			</style>
-
 			<button id="steppable-number--button-subtract" class="steppable-number--button-subtract">-</button>
 			<span class="steppable-number--value" id="steppable-number--value">0</span>
 			<button id="steppable-number--button-add" class="steppable-number--button-add">+</button>
-			
 		</template>
     <script lang="javascript">
 			const currentDocument = document.currentScript.ownerDocument;
@@ -153,7 +152,6 @@
 						}
 					}
 				}
-
 				_subtractFromValue() {
 					const currentValue = parseInt(this.getAttribute('value'), 10);
 					const minValue = parseInt(this.getAttribute('min'), 10);
@@ -169,7 +167,6 @@
 								this._valueChanged();
 							}
 						}
-						
 					}
 				}
 
@@ -210,7 +207,6 @@
 					this.render();
       	}
       }
-
       customElements.define('steppable-number', SteppableNumber);
     </script>
   </head>
@@ -234,7 +230,6 @@
       <span id="current_points" class="current_points points_positive">28</span>
       <span class="points_label">Points remaining</span>
 		</div>
-		<steppable-number onchange="console.log(event, this.value)" value="5" id="stepper"></steppable-number>
     <button onclick="reset()">Reset</button>
     <hr />
 
@@ -301,7 +296,7 @@
     </p>
     <p class="attribute_wrapper">
       <span class="attr_name">CON: </span>
-      <input
+      <!-- <input
         type="number"
         onfocus="this.select();"
         pattern="[0-9]*"
@@ -311,8 +306,9 @@
         value="8"
         class="attribute with_margin"
         onchange="recalculate()"
-			/>
-			<steppable-number onchange="updateBonus('attr_con')" value="0" min="-10" max="10" id="attr_con_bonus"></steppable-number>
+			/> -->
+			<steppable-number onchange="recalculate()" value="8" min="8" max="18" id="attr_con" class="bonus with_margin"></steppable-number>
+			<steppable-number onchange="updateBonus('attr_con')" value="0" min="-10" max="10" id="attr_con_bonus" class="bonus with_margin"></steppable-number>
       <!-- <input
         type="number"
         onfocus="this.select();"
