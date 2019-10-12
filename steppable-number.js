@@ -1,9 +1,11 @@
-if (typeof(currentDocument) === 'undefined') {
+if (typeof currentDocument === "undefined") {
   const currentDocument = document.currentScript.ownerDocument;
 }
 
 class SteppableNumber extends HTMLElement {
-  _template = `<style>
+  constructor() {
+    super();
+    this._template = `<style>
 	:host {
 		display: inline-flex;
 		flex-direction: row;
@@ -26,10 +28,8 @@ class SteppableNumber extends HTMLElement {
 <button id="steppable-number--button-subtract" class="steppable-number--button-subtract">-</button>
 <span class="steppable-number--value" id="steppable-number--value">0</span>
 <button id="steppable-number--button-add" class="steppable-number--button-add">+</button>`;
-  _valueDomNode;
-  _shadowRoot;
-  constructor() {
-    super();
+    this._valueDomNode;
+    this._shadowRoot;
   }
 
   render() {

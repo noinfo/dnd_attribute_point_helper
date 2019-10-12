@@ -2,7 +2,9 @@ if (typeof currentDocument === "undefined") {
   const currentDocument = document.currentScript.ownerDocument;
 }
 class AttributeRow extends HTMLElement {
-  _template = `
+  constructor() {
+    super();
+    this._template = `
 <style>
 .attribute_wrapper {
   display: flex;
@@ -39,14 +41,11 @@ class AttributeRow extends HTMLElement {
 <span class="total" id="attr_total">8</span>
 <span class="modifier" id="attr_mod">-1</span>
 </p>`;
-  _attrDomNode;
-  _attr_bonusDomNode;
-  _attr_totalDomNode;
-  _attr_modDomNode;
-
-  _shadowRoot;
-  constructor() {
-    super();
+    this._attrDomNode;
+    this._attr_bonusDomNode;
+    this._attr_totalDomNode;
+    this._attr_modDomNode;
+    this._shadowRoot;
   }
 
   render() {
