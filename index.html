@@ -67,23 +67,6 @@
       .with_margin {
         margin: 0 0.2rem;
       }
-
-      .attr_name {
-        flex: 1;
-      }
-      .attribute,
-      .bonus {
-        flex: 1;
-        text-align: center;
-        box-sizing: border-box;
-				justify-content: center;
-      }
-      .modifier,
-      .total {
-        flex: 1;
-        min-width: 3em;
-        text-align: center;
-      }
       button {
         background: rgb(180, 180, 180);
         color: rgb(32, 32, 32);
@@ -97,96 +80,120 @@
       }
 		</style>
 		<script lang="javascript" src="steppable-number.js"></script>
-		<template id="attribute-row">
-				<p class="attribute_wrapper">
-						<span class="attr_name"><slot></slot></span>
-						<steppable-number value="8" min="8" max="18" id="attr" class="bonus with_margin"></steppable-number>
-						<steppable-number value="0" min="-10" max="10" id="attr_bonus" class="bonus with_margin"></steppable-number>
-						<span class="total" id="attr_total">8</span>
-						<span class="modifier" id="attr_mod">-1</span>
-					</p>
-		</template>
+		<script lang="javascript" src="attribute-row.js"></script>
 		<script lang="javascript">
-			if (typeof(currentDocument) === 'undefined') {
-  			const currentDocument = document.currentScript.ownerDocument;
-			}
-			class AttributeRow extends HTMLElement {
-				_template = ``;
-				_attrDomNode;
-				_attr_bonusDomNode;
-				_attr_totalDomNode;
-				_attr_modDomNode;
-
-				_shadowRoot;
-				constructor() {
-					super();
+				document.addEventListener("DOMContentLoaded",()=>{
+					// console.log(`finshed loading`);
+					this.isInitialized = true;
+				});
+				var total_points=28,
+				current_points=28,
+				isInitialized = false;
+				function setSpan(id, newvalue){
+					var element = document.getElementById(id);
+					if(element){
+						element.innerText = newvalue;
+					}
 				}
-
-				render() {
-					// this._attrDomNode.innerText = this.getAttribute('value');
-					this._setModifierAndTotalFromAttribute();
+				function setValue(id, newvalue){
+					var element = document.getElementById(id);
+					if(element){
+						element.value = newvalue;
+					}
 				}
-				// get modifier from attribute value as defined by the D&D Players Handbook
-				_getModifier(attribute_value){
-      		return Math.floor((attribute_value -10) / 2);
-      	}
-      	_setModifierAndTotalFromAttribute(){
-					if(!this._attrDomNode || !this._attr_bonusDomNode || !this._attr_totalDomNode || !this._attr_modDomNode){
-						console.error("attribute, modifier or bonus dom node not found ", this);
+				function resetAttribute(id){
+					var element = document.getElementById(id);
+					if(element && typeof element.reset === "function"){
+						element.reset();
+					}
+				}
+				function reset(total = 28) {
+					// console.log("resetting to " + total);
+					total_points = total;
+					current_points = total;
+	
+					updatePointsDisplay();
+
+					var attributes = ["str","dex","con","int","wis","cha"];
+					attributes.forEach(function (attribute) {
+						resetAttribute(attribute);
+					});
+	
+				}
+	
+				function updateCurrentPointsClass() {
+					var current_points_dom_node = document.getElementById("current_points");
+					if(!current_points_dom_node){
 						return;
 					}
-					const attribute_value = parseInt(this._attrDomNode.value, 10);
-					const bonus_value = parseInt(this._attr_bonusDomNode.value, 10);
-					if(!isNaN(attribute_value) && !isNaN(bonus_value)){
-						this._attr_modDomNode.innerText = this._getModifier(attribute_value + bonus_value) 
-						this._attr_totalDomNode.innerText = attribute_value + bonus_value;
+					let newClassName = "current_points ";
+					if(current_points < 0){
+						newClassName += "points_negative";
 					}
-					return;
-	      }
+					if(current_points === 0){
+						newClassName += "points_zero";
+					}
+					if(current_points > 0){
+						newClassName += "points_positive";
+					}
+					current_points_dom_node.className = newClassName;
+				}
+	
+				function updatePointsDisplay() {
+					setValue("total_points", total_points);
+					setSpan("current_points", current_points);
+					updateCurrentPointsClass();
+				}
+				function getPointCost(attribute_ID){
+					var attribute_dom_node = document.getElementById(attribute_ID);
+					if(!attribute_dom_node){
+						console.error("attribute dom node not found ", attribute_ID);
+						return 0;
+					}
+					const attribute_value = parseInt(attribute_dom_node.value, 10);
+					switch(attribute_value){
+						case 9:
+							return 1;
+						case 10:
+							return 2;
+						case 11:
+							return 3;
+						case 12:
+							return 4;
+						case 13:
+							return 5;
+						case 14:
+							return 6;
+						case 15:
+							return 8;
+						case 16:
+							return 10;
+						case 17:
+							return 13;
+						case 18:
+							return 16;
+						default:
+							return 0;
+					}
+				}
+				
+				function recalculate(){
+					if(!this.isInitialized){
+						// console.log(`not initialized. not recalculating`);
+						return;
+					}
+					current_points = total_points;
+					current_points -= getPointCost("str");
+					current_points -= getPointCost("dex");
+					current_points -= getPointCost("con");
+					current_points -= getPointCost("int");
+					current_points -= getPointCost("wis");
+					current_points -= getPointCost("cha");
+	
+					updatePointsDisplay();
+				}
 
-				get value(){
-					return this._attrDomNode.value;
-				}
-				set value(newValue){
-					this._attrDomNode.value = newValue;
-					this.render();
-				}
-				reset(){
-					const initialvalue = parseInt(this.getAttribute('initialvalue'), 10);
-					this._attrDomNode.value = isNaN(initialvalue) ? 8 : initialvalue;
-					this._attr_bonusDomNode.value = 0;
-					this.render();
-				}
-				connectedCallback() {
-        	this._shadowRoot = this.attachShadow({mode: 'open'});
-					// Select the template and clone it. Finally attach the cloned node to the shadowDOM's root.
-					// Current document needs to be defined to get DOM access to imported HTML
-					const template = document.getElementById("attribute-row");
-					// const template = document.createElement('template');
-					// template.innerHTML = this._template;
-					const instance = template.content.cloneNode(true);
-					this._shadowRoot.appendChild(instance);
-					this._attrDomNode = this._shadowRoot.getElementById("attr");
-					this._attr_bonusDomNode = this._shadowRoot.getElementById("attr_bonus");
-					this._attr_totalDomNode = this._shadowRoot.getElementById("attr_total");
-					this._attr_modDomNode = this._shadowRoot.getElementById("attr_mod");
-
-					// check if initialvalue is set; fallback to 8
-					const initialvalue = parseInt(this.getAttribute('initialvalue'), 10);
-					
-					this._attrDomNode.value = isNaN(initialvalue) ? 8 : initialvalue;
-					// add event listeners
-					this._attrDomNode.addEventListener('click', e => {
-						this.render();
-					});
-					this._attr_bonusDomNode.addEventListener('click', e => {
-						this.render();
-					});
-					this.render();
-				}
-      }
-      customElements.define('attribute-row', AttributeRow);
-		</script>
+			</script>
   </head>
   <body>
     <h1>Attribute Point Buy Helper</h1>
@@ -208,300 +215,22 @@
       <span id="current_points" class="current_points points_positive">28</span>
       <span class="points_label">Points remaining</span>
 		</div>
-		<attribute-row id="str" initialvalue="10" onchange="console.log(`STR changed to: ${this.value}`);">STR: </attribute-row>
     <button onclick="reset()">Reset</button>
     <hr />
 
-    <p class="heading_wrapper" for="attr_str">
+    <p class="heading_wrapper">
       <span class="heading"></span>
       <span class="heading with_margin">Attribute</span>
       <span class="heading with_margin">Bonus</span>
       <span class="heading">Total</span>
       <span class="heading">Modifier</span>
     </p>
-    <p class="attribute_wrapper">
-      <span class="attr_name">STR: </span>
-      <input
-        type="number"
-        onfocus="this.select();"
-        pattern="[0-9]*"
-        id="attr_str"
-        min="8"
-        max="18"
-        value="8"
-        class="attribute with_margin"
-        onchange="recalculate()"
-      />
-      <input
-        type="number"
-        onfocus="this.select();"
-        pattern="[0-9]*"
-        id="attr_str_bonus"
-        min="-10"
-        max="10"
-        value="0"
-        class="bonus with_margin"
-        onchange="updateBonus('attr_str')"
-      />
-      <span class="total" id="attr_str_total">8</span>
-      <span class="modifier" id="attr_str_mod">-1</span>
-    </p>
-    <p class="attribute_wrapper">
-      <span class="attr_name">DEX: </span>
-      <input
-        type="number"
-        onfocus="this.select();"
-        pattern="[0-9]*"
-        id="attr_dex"
-        min="8"
-        max="18"
-        value="8"
-        class="attribute with_margin"
-        onchange="recalculate()"
-      />
-      <input
-        type="number"
-        onfocus="this.select();"
-        pattern="[0-9]*"
-        id="attr_dex_bonus"
-        min="-10"
-        max="10"
-        value="0"
-        class="bonus with_margin"
-        onchange="updateBonus('attr_dex')"
-      />
-      <span class="total" id="attr_dex_total">8</span>
-      <span class="modifier" id="attr_dex_mod">-1</span>
-    </p>
-    <p class="attribute_wrapper">
-      <span class="attr_name">CON: </span>
-      <!-- <input
-        type="number"
-        onfocus="this.select();"
-        pattern="[0-9]*"
-        id="attr_con"
-        min="8"
-        max="18"
-        value="8"
-        class="attribute with_margin"
-        onchange="recalculate()"
-			/> -->
-			<steppable-number onchange="recalculate()" value="8" min="8" max="18" id="attr_con" class="bonus with_margin"></steppable-number>
-			<steppable-number onchange="updateBonus('attr_con')" value="0" min="-10" max="10" id="attr_con_bonus" class="bonus with_margin"></steppable-number>
-      <!-- <input
-        type="number"
-        onfocus="this.select();"
-        pattern="[0-9]*"
-        id="attr_con_bonus"
-        min="-10"
-        max="10"
-        value="0"
-        class="bonus with_margin"
-        onchange="updateBonus('attr_con')"
-      /> -->
-      <span class="total" id="attr_con_total">8</span>
-      <span class="modifier" id="attr_con_mod">-1</span>
-    </p>
-    <p class="attribute_wrapper">
-      <span class="attr_name">INT: </span>
-      <input
-        type="number"
-        onfocus="this.select();"
-        pattern="[0-9]*"
-        id="attr_int"
-        min="8"
-        max="18"
-        value="8"
-        class="attribute with_margin"
-        onchange="recalculate()"
-      />
-      <input
-        type="number"
-        onfocus="this.select();"
-        pattern="[0-9]*"
-        id="attr_int_bonus"
-        min="-10"
-        max="10"
-        value="0"
-        class="bonus with_margin"
-        onchange="updateBonus('attr_int')"
-      />
-      <span class="total" id="attr_int_total">8</span>
-      <span class="modifier" id="attr_int_mod">-1</span>
-    </p>
-    <p class="attribute_wrapper">
-      <span class="attr_name">WIS: </span>
-      <input
-        type="number"
-        onfocus="this.select();"
-        pattern="[0-9]*"
-        id="attr_wis"
-        min="8"
-        max="18"
-        value="8"
-        class="attribute with_margin"
-        onchange="recalculate()"
-      />
-      <input
-        type="number"
-        onfocus="this.select();"
-        pattern="[0-9]*"
-        id="attr_wis_bonus"
-        min="-10"
-        max="10"
-        value="0"
-        class="bonus with_margin"
-        onchange="updateBonus('attr_wis')"
-      />
-      <span class="total" id="attr_wis_total">8</span>
-      <span class="modifier" id="attr_wis_mod">-1</span>
-    </p>
-    <p class="attribute_wrapper">
-      <span class="attr_name">CHA: </span>
-      <input
-        type="number"
-        onfocus="this.select();"
-        pattern="[0-9]*"
-        id="attr_cha"
-        min="8"
-        max="18"
-        value="8"
-        class="attribute with_margin"
-        onchange="recalculate()"
-      />
-      <input
-        type="number"
-        onfocus="this.select();"
-        pattern="[0-9]*"
-        id="attr_cha_bonus"
-        min="-10"
-        max="10"
-        value="0"
-        class="bonus with_margin"
-        onchange="updateBonus('attr_cha')"
-      />
-      <span class="total" id="attr_cha_total">8</span>
-      <span class="modifier" id="attr_cha_mod">-1</span>
-    </p>
-    <script lang="javascript">
-      var total_points=28,
-      current_points=28;
-      function setSpan(id, newvalue){
-      	var element = document.getElementById(id);
-      	if(element){
-      		element.innerText = newvalue;
-      	}
-      }
-      function setValue(id, newvalue){
-      	var element = document.getElementById(id);
-      	if(element){
-      		element.value = newvalue;
-      	}
-      }
-      function reset(total = 28) {
-      	// console.log("resetting to " + total);
-      	total_points = total;
-      	current_points = total;
-      	var default_attribute_value = 8;
-
-      	updatePointsDisplay();
-
-      	var attributes = ["attr_str","attr_dex","attr_con","attr_int","attr_wis","attr_cha"];
-
-      	attributes.forEach(function (attribute) {
-      		setValue(attribute, default_attribute_value);
-      		setValue(attribute + "_bonus", 0);
-      		setModifierAndTotalFromAttributeReturnCost(attribute);
-      	});
-
-      }
-
-      function updateCurrentPointsClass() {
-      	var current_points_dom_node = document.getElementById("current_points");
-      	if(!current_points_dom_node){
-      		return;
-      	}
-      	let newClassName = "current_points ";
-      	if(current_points < 0){
-      		newClassName += "points_negative";
-      	}
-      	if(current_points === 0){
-      		newClassName += "points_zero";
-      	}
-      	if(current_points > 0){
-      		newClassName += "points_positive";
-      	}
-      	current_points_dom_node.className = newClassName;
-      }
-
-      function updatePointsDisplay() {
-      	setValue("total_points", total_points);
-      	setSpan("current_points", current_points);
-      	updateCurrentPointsClass();
-      }
-      function getModifier(attribute_value){
-      		return Math.floor((attribute_value -10) / 2);
-      }
-      function getPointCost(attribute_value){
-      	switch(attribute_value){
-      		case 9:
-      			return 1;
-      		case 10:
-      			return 2;
-      		case 11:
-      			return 3;
-      		case 12:
-      			return 4;
-      		case 13:
-      			return 5;
-      		case 14:
-      			return 6;
-      		case 15:
-      			return 8;
-      		case 16:
-      			return 10;
-      		case 17:
-      			return 13;
-      		case 18:
-      			return 16;
-      		default:
-      			return 0;
-      	}
-      }
-      function updateBonus(attribute_ID) {
-      	setModifierAndTotalFromAttributeReturnCost(attribute_ID);
-      }
-      function setModifierAndTotalFromAttributeReturnCost(attribute_ID){
-      	var attribute_dom_node = document.getElementById(attribute_ID);
-      	var total_dom_node = document.getElementById(attribute_ID + "_total");
-      	var modifier_dom_node = document.getElementById(attribute_ID + "_mod");
-      	var bonus_dom_node = document.getElementById(attribute_ID + "_bonus");
-      	if(!attribute_dom_node || !modifier_dom_node || !bonus_dom_node || !total_dom_node){
-      		console.error("attribute, modifier or bonus dom node not found ", attribute_ID);
-      		return 0;
-      	}
-      	var attribute_value = parseInt(attribute_dom_node.value, 10);
-      	var bonus_value = parseInt(bonus_dom_node.value, 10);
-      	if(!isNaN(attribute_value) && !isNaN(bonus_value)){
-      			setSpan(attribute_ID + "_mod", getModifier(attribute_value + bonus_value));
-      			setSpan(attribute_ID + "_total", attribute_value + bonus_value);
-      			return (getPointCost(attribute_value));
-      	}
-      	return 0;
-      }
-
-      function recalculate(){
-      	current_points = total_points;
-      	current_points -= setModifierAndTotalFromAttributeReturnCost("attr_str");
-      	current_points -= setModifierAndTotalFromAttributeReturnCost("attr_dex");
-      	current_points -= setModifierAndTotalFromAttributeReturnCost("attr_con");
-      	current_points -= setModifierAndTotalFromAttributeReturnCost("attr_int");
-      	current_points -= setModifierAndTotalFromAttributeReturnCost("attr_wis");
-      	current_points -= setModifierAndTotalFromAttributeReturnCost("attr_cha");
-
-      	updatePointsDisplay();
-
-      }
-    </script>
+    
+		<attribute-row id="str" initialvalue="8" onchange="recalculate()">STR: </attribute-row>
+		<attribute-row id="dex" initialvalue="8" onchange="recalculate()">DEX: </attribute-row>
+		<attribute-row id="con" initialvalue="8" onchange="recalculate()">CON: </attribute-row>
+		<attribute-row id="int" initialvalue="8" onchange="recalculate()">INT: </attribute-row>
+		<attribute-row id="wis" initialvalue="8" onchange="recalculate()">WIS: </attribute-row>
+		<attribute-row id="cha" initialvalue="8" onchange="recalculate()">CHA: </attribute-row>    
   </body>
 </html>
