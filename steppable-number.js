@@ -13,14 +13,16 @@ class SteppableNumber extends HTMLElement {
 	}
 	.steppable-number--value {
 		display: inline-box;
-		min-width: 3em;
+		min-width: 2.25em;
 		text-align: center;
 		line-height: 2em;
 	}
 	.steppable-number--button-subtract, .steppable-number--button-add {
 		font-size: 16px;
 		height: 2em;
-		width: 2em;
+    width: 2em;
+    lin-height: 2em;
+    padding: 0;
 		text-align: center;
 	}
 	
