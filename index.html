@@ -62,6 +62,7 @@
         flex: 1;
         font-size: smaller;
         text-align: center;
+		min-width: 4.75rem;
       }
 
       .with_margin {
@@ -205,6 +206,8 @@
         pattern="[0-9]*"
         id="total_points"
         class="total_points"
+		min="0"
+		max="96"
         value="28"
         onchange="reset(document.getElementById('total_points').value)"
       />
@@ -214,7 +217,7 @@
     <div class="base_options_row">
       <span id="current_points" class="current_points points_positive">28</span>
       <span class="points_label">Points remaining</span>
-		</div>
+	</div>
     <button onclick="reset()">Reset</button>
     <hr />
 

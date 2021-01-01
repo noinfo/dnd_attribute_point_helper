@@ -18,6 +18,7 @@ class AttributeRow extends HTMLElement {
 
 .attr_name {
   flex: 1;
+  min-width: 3rem;
 }
 .attribute,
 .bonus {
