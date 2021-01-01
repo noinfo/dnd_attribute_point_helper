@@ -112,12 +112,24 @@
 					// console.log("resetting to " + total);
 					total_points = total;
 					current_points = total;
-	
 					updatePointsDisplay();
+					document.getElementById('max_attr_value').value = 15;
+					updateMaxAttributeValue(15);
 
 					var attributes = ["str","dex","con","int","wis","cha"];
 					attributes.forEach(function (attribute) {
 						resetAttribute(attribute);
+					});
+	
+				}
+				function updateMaxAttributeValue(max_attr_value = 15) {
+					// update max attribute values
+					var attributes = ["str","dex","con","int","wis","cha"];
+					attributes.forEach(function (attribute) {
+						var element = document.getElementById(attribute);
+						if(element ){
+							element.setAttribute("maxvalue", max_attr_value);
+						}
 					});
 	
 				}
@@ -218,6 +230,22 @@
       <span id="current_points" class="current_points points_positive">28</span>
       <span class="points_label">Points remaining</span>
 	</div>
+
+	<div class="base_options_row">
+	  <input
+        type="number"
+        onfocus="this.select();"
+        pattern="[0-9]*"
+        id="max_attr_value"
+        class="total_points"
+		min="8"
+		max="20"
+        value="15"
+        onchange="updateMaxAttributeValue(document.getElementById('max_attr_value').value)"
+      />
+      <span class="points_label">Maximum attribute value</span>
+	</div>
+
     <button onclick="reset()">Reset</button>
     <hr />
 
@@ -229,11 +257,11 @@
       <span class="heading">Modifier</span>
     </p>
     
-		<attribute-row id="str" initialvalue="8" onchange="recalculate()">STR: </attribute-row>
-		<attribute-row id="dex" initialvalue="8" onchange="recalculate()">DEX: </attribute-row>
-		<attribute-row id="con" initialvalue="8" onchange="recalculate()">CON: </attribute-row>
-		<attribute-row id="int" initialvalue="8" onchange="recalculate()">INT: </attribute-row>
-		<attribute-row id="wis" initialvalue="8" onchange="recalculate()">WIS: </attribute-row>
-		<attribute-row id="cha" initialvalue="8" onchange="recalculate()">CHA: </attribute-row>    
+	<attribute-row id="str" initialvalue="8" maxvalue="15" onchange="recalculate()">STR: </attribute-row>
+	<attribute-row id="dex" initialvalue="8" maxvalue="15" onchange="recalculate()">DEX: </attribute-row>
+	<attribute-row id="con" initialvalue="8" maxvalue="15" onchange="recalculate()">CON: </attribute-row>
+	<attribute-row id="int" initialvalue="8" maxvalue="15" onchange="recalculate()">INT: </attribute-row>
+	<attribute-row id="wis" initialvalue="8" maxvalue="15" onchange="recalculate()">WIS: </attribute-row>
+	<attribute-row id="cha" initialvalue="8" maxvalue="15" onchange="recalculate()">CHA: </attribute-row>    
   </body>
 </html>

@@ -3,8 +3,10 @@ if (typeof currentDocument === "undefined") {
 }
 
 class SteppableNumber extends HTMLElement {
+  static get observedAttributes() { return ['max']; }
   constructor() {
     super();
+    this._hasRenderedOnce = false;
     this._template = `<style>
 	:host {
 		display: inline-flex;
@@ -36,8 +38,16 @@ class SteppableNumber extends HTMLElement {
 
   render() {
     this._valueDomNode.innerText = this.getAttribute("value");
+    this._hasRenderedOnce = true;
   }
-
+  _maxValueChanged() {
+    const currentValue = parseInt(this.getAttribute("value"), 10);
+    const maxValue = parseInt(this.getAttribute("max"), 10);
+    if (!isNaN(currentValue) && !isNaN(maxValue) && currentValue > maxValue) {
+      this.setAttribute("value", maxValue);
+      this._valueChanged();
+    }
+  }
   _addToValue() {
     const currentValue = parseInt(this.getAttribute("value"), 10);
     const maxValue = parseInt(this.getAttribute("max"), 10);
@@ -115,6 +125,11 @@ class SteppableNumber extends HTMLElement {
         this._addToValue();
       });
     this.render();
+  }
+  attributeChangedCallback(name, oldValue, newValue) {
+    if(name === "max" && this._hasRenderedOnce) {
+      this._maxValueChanged();
+    }
   }
 }
 customElements.define("steppable-number", SteppableNumber);

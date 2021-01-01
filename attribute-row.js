@@ -2,6 +2,8 @@ if (typeof currentDocument === "undefined") {
   const currentDocument = document.currentScript.ownerDocument;
 }
 class AttributeRow extends HTMLElement {
+  static get observedAttributes() { return ['maxvalue']; }
+
   constructor() {
     super();
     this._template = `
@@ -109,6 +111,11 @@ class AttributeRow extends HTMLElement {
     // check if initialvalue is set; fallback to 8
     const initialvalue = parseInt(this.getAttribute("initialvalue"), 10);
     this._attrDomNode.value = isNaN(initialvalue) ? 8 : initialvalue;
+    const maxvalue = this.getAttribute("maxvalue");
+    if(maxvalue) {
+      this._attrDomNode.setAttribute("max", maxvalue);
+    }
+    
     // add event listeners
     this._attrDomNode.addEventListener("click", e => {
       this.render();
@@ -117,6 +124,12 @@ class AttributeRow extends HTMLElement {
       this.render();
     });
     this.render();
+  }
+  attributeChangedCallback(name, oldValue, newValue) {
+    if(name === "maxvalue" && this._attrDomNode) {
+      this._attrDomNode.setAttribute("max", newValue);
+      this._setModifierAndTotalFromAttribute();
+    }
   }
 }
 customElements.define("attribute-row", AttributeRow);
