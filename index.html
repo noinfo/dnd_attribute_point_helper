@@ -87,8 +87,8 @@
 					// console.log(`finshed loading`);
 					this.isInitialized = true;
 				});
-				var total_points=28,
-				current_points=28,
+				var total_points=27,
+				current_points=27,
 				isInitialized = false;
 				function setSpan(id, newvalue){
 					var element = document.getElementById(id);
@@ -108,7 +108,7 @@
 						element.reset();
 					}
 				}
-				function reset(total = 28) {
+				function reset(total = 27) {
 					// console.log("resetting to " + total);
 					total_points = total;
 					current_points = total;
@@ -221,14 +221,14 @@
         class="total_points"
 		min="0"
 		max="96"
-        value="28"
+        value="27"
         onchange="reset(document.getElementById('total_points').value)"
       />
       <span class="points_label">Total Points</span>
     </label>
 
     <div class="base_options_row">
-      <span id="current_points" class="current_points points_positive">28</span>
+      <span id="current_points" class="current_points points_positive">27</span>
       <span class="points_label">Points remaining</span>
 	</div>
 
